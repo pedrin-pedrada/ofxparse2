@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 
+from datetime import timezone
 import sys
 import decimal
 import datetime
@@ -514,7 +515,8 @@ class OfxParser(object):
 
         try:
             local_date = datetime.datetime.strptime(ofxDateTime[:14], '%Y%m%d%H%M%S')
-            return local_date - timeZoneOffset + msec
+            return (local_date - timeZoneOffset + msec).replace(tzinfo=timezone.utc)
+
         except ValueError:
             if ofxDateTime[:8] == "00000000":
                 return None

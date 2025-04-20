@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ofxparse2"
-version = "0.2.1"
+version = "0.2.2"
 description = "A parser for OFX files with improved encoding detection and compatibility with malformed headers"
 authors = ["Pedro Schneider <you@example.com>"]
 readme = "README.md"
