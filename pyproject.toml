@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "ofxparse2"
+version = "0.2.0"
+description = "A parser for OFX files with improved encoding detection and compatibility with malformed headers"
+authors = ["Pedro Schneider <you@example.com>"]
+readme = "README.md"
+license = "MIT"
+packages = [
+    { include = "ofxparse" }
+]
+homepage = "https://github.com/pedrin-pedrada/ofxparse2"
+repository = "https://github.com/pedrin-pedrada/ofxparse2"
+
+[tool.poetry.dependencies]
+python = ">=3.10"
+beautifulsoup4 = "==4.9.3"
+six = "^1.17.0"
+coverage = "^7.8.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
