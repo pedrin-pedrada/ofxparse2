@@ -19,7 +19,7 @@ except ImportError:
     from collections import Iterable
 
 import six
-from . import mcc
+import mcc
 
 odict = collections
 
@@ -57,6 +57,19 @@ def save_pos(fh):
         yield fh
     finally:
         fh.seek(orig_pos)
+
+
+def extract_xml_encoding_from_file(fh) -> str | None:
+    pos = fh.tell()
+    raw = fh.read(1024)
+    fh.seek(pos)
+    try:
+        text = raw.decode("ascii", errors="ignore")
+    except Exception:
+        return None
+
+    match = re.search(r'<\?xml[^>]*encoding=["\']([^"\']+)["\']', text, re.IGNORECASE)
+    return match.group(1) if match else None
 
 
 class OfxFile(object):
@@ -114,10 +127,15 @@ class OfxFile(object):
         enc_type = ascii_headers.get('ENCODING')
 
         if not enc_type:
-            # no encoding specified, use the ascii-decoded headers
+            # try extract own xml
+            encoding = extract_xml_encoding_from_file(self.fh)
+
+            if not encoding:
+                encoding = "ascii"  # fallback
+
             self.headers = ascii_headers
-            # decode the body as ascii as well
-            self.fh = codecs.lookup('ascii').streamreader(self.fh)
+            self.fh = codecs.lookup(encoding).streamreader(self.fh, errors="ignore")
+
             return
 
         if enc_type == "USASCII":
@@ -1106,3 +1124,22 @@ class OfxParser(object):
         # Handle +1058,53 formatted numbers
         d = d.replace('+', '')
         return decimal.Decimal(d)
+
+
+def main(file_path):
+    # Test the OfxParser
+    with open(file_path, "rb") as file_handle:
+        ofx_obj = OfxParser.parse(file_handle)
+        print(ofx_obj)
+        for account in ofx_obj.accounts:
+            print(account.account_id, account.statement.start_date, account.statement.end_date)
+            for transaction in account.statement.transactions:
+                print(transaction.date, transaction.amount, transaction.payee)
+
+
+if __name__ == "__main__":
+    import sys
+    if len(sys.argv) < 2:
+        print("Usage: python ofxparse.py <path_to_ofx_file>")
+    else:
+        main(sys.argv[1])
