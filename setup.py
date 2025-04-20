@@ -1,6 +1,6 @@
 setup(
     name='ofxparse2',
-    version='0.1.0',
+    version='0.2.1',
     description='Fork ofxparse lib with some acceptance fixes',
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
